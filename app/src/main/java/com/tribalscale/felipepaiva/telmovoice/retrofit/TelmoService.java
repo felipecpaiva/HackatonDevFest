@@ -1,6 +1,8 @@
 package com.tribalscale.felipepaiva.telmovoice.retrofit;
 
-import okhttp3.RequestBody;
+import com.tribalscale.felipepaiva.telmovoice.models.request.VoiceRequest;
+import com.tribalscale.felipepaiva.telmovoice.models.response.VoiceRequestResponse;
+
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -13,5 +15,5 @@ public interface TelmoService {
     Call<Response> pushAudio(@Path("user") String user);
 
     @POST("https://telmo.pagekite.me/")
-    Call<ResponseBody> uploadMultipleFilesDynamic(@Body VoiceRequest files);
+    Call<VoiceRequestResponse> uploadMultipleFilesDynamic(@Body VoiceRequest files);
 }

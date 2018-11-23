@@ -20,7 +20,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.tribalscale.felipepaiva.telmovoice.retrofit.RetrofitImpl;
-import com.tribalscale.felipepaiva.telmovoice.retrofit.VoiceRequest;
+import com.tribalscale.felipepaiva.telmovoice.models.request.VoiceRequest;
 
 import java.io.File;
 import java.io.FileInputStream;

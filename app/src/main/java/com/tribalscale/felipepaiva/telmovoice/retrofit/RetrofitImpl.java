@@ -22,7 +22,6 @@ public class RetrofitImpl implements RetrofitInterface {
                 .addInterceptor(interceptor)
                 .build();
 
-
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://telmo.pagekite.me/")
                 .client(okHttpClient)

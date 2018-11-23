@@ -27,9 +27,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         Intent checkIntent = new Intent();
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(checkIntent, MY_DATA_CHECK_CODE);
+        speakText("Hello World");
     }
 
     @Override

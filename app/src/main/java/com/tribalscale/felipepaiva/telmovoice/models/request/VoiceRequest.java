@@ -1,8 +1,12 @@
-package com.tribalscale.felipepaiva.telmovoice.retrofit;
+package com.tribalscale.felipepaiva.telmovoice.models.request;
 
 public class VoiceRequest {
 
     private String data;
+
+    private String text;
+
+    private String id;
 
     public String getData() {
         return data;
