@@ -19,6 +19,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.tribalscale.felipepaiva.telmovoice.models.response.VoiceRequestResponse;
 import com.tribalscale.felipepaiva.telmovoice.retrofit.RetrofitImpl;
 import com.tribalscale.felipepaiva.telmovoice.models.request.VoiceRequest;
 
@@ -40,7 +41,7 @@ import retrofit2.Response;
 
 import static android.os.Environment.getExternalStorageDirectory;
 
-public class RegistrationActivity extends AppCompatActivity {
+public class RegistrationActivity extends BaseActivity {
 
     private static final String LOG_TAG = "AudioRecordTest";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
@@ -127,28 +128,27 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void sendFile() {
-//        MultipartBody.Part body = prepareFilePart("marko_voice_signature", mFileName);
-
-        Call<ResponseBody> responseBodyCall = null;
+        Call<VoiceRequestResponse> responseBodyCall = null;
         RequestBody body = null;
         try {
-//            body = RequestBody.create(MediaType.parse("application/json"), encodeFileToBase64Binary(mFileName));
             VoiceRequest voiceRequest = new VoiceRequest();
+            voiceRequest.setText("balance");
+            voiceRequest.setId("Mark1234000123");
             voiceRequest.setData(encodeFileToBase64Binary(mFileName));
             responseBodyCall = retrofit.getTelmoService().uploadMultipleFilesDynamic(voiceRequest);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        responseBodyCall.enqueue(new Callback<ResponseBody>() {
+        responseBodyCall.enqueue(new Callback<VoiceRequestResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.d("",response.toString());
+            public void onResponse(Call<VoiceRequestResponse> call, Response<VoiceRequestResponse> response) {
+                speakText(response.body().getMessage());
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.d("",t.getLocalizedMessage());
+            public void onFailure(Call<VoiceRequestResponse> call, Throwable t) {
+
             }
         });
     }
