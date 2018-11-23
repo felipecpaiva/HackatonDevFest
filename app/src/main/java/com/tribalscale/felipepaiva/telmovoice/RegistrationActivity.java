@@ -1,6 +1,7 @@
 package com.tribalscale.felipepaiva.telmovoice;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
@@ -8,20 +9,24 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.tribalscale.felipepaiva.telmovoice.retrofit.RetrofitImpl;
-import com.tribalscale.felipepaiva.telmovoice.retrofit.RetrofitInterface;
-import com.tribalscale.felipepaiva.telmovoice.retrofit.TelmoService;
+import com.tribalscale.felipepaiva.telmovoice.retrofit.VoiceRequest;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
 
 import javax.inject.Inject;
 
@@ -32,6 +37,8 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.os.Environment.getExternalStorageDirectory;
 
 public class RegistrationActivity extends AppCompatActivity {
 
@@ -45,11 +52,12 @@ public class RegistrationActivity extends AppCompatActivity {
     private PlayButton   mPlayButton = null;
     private MediaPlayer mPlayer = null;
 
-    @Inject RetrofitInterface retrofit;
+    @Inject RetrofitImpl retrofit;
 
     // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
     private String [] permissions = {Manifest.permission.RECORD_AUDIO};
+    private ContentResolver contentResolver;
 
 
     @Override
@@ -61,7 +69,6 @@ public class RegistrationActivity extends AppCompatActivity {
                 break;
         }
         if (!permissionToRecordAccepted ) finish();
-
     }
 
     private void onRecord(boolean start) {
@@ -101,7 +108,7 @@ public class RegistrationActivity extends AppCompatActivity {
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
         mRecorder.setOutputFile(mFileName);
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 
         try {
             mRecorder.prepare();
@@ -120,8 +127,18 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void sendFile() {
-        MultipartBody.Part body = prepareFilePart("marko_voice_signature", mFileName);
-        Call<ResponseBody> responseBodyCall = retrofit.getTelmoService().uploadMultipleFilesDynamic(body);
+//        MultipartBody.Part body = prepareFilePart("marko_voice_signature", mFileName);
+
+        Call<ResponseBody> responseBodyCall = null;
+        RequestBody body = null;
+        try {
+//            body = RequestBody.create(MediaType.parse("application/json"), encodeFileToBase64Binary(mFileName));
+            VoiceRequest voiceRequest = new VoiceRequest();
+            voiceRequest.setData(encodeFileToBase64Binary(mFileName));
+            responseBodyCall = retrofit.getTelmoService().uploadMultipleFilesDynamic(voiceRequest);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         responseBodyCall.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -136,22 +153,76 @@ public class RegistrationActivity extends AppCompatActivity {
         });
     }
 
+    private String encodeFileToBase64Binary(String fileName)
+            throws IOException {
+
+        File file = new File(fileName);
+        byte[] bytes = loadFile(file);
+        byte[] encoded = Base64.getEncoder().encode(bytes);
+        String encodedString = new String(encoded);
+
+        return encodedString;
+    }
+
+    private static byte[] loadFile(File file) throws IOException {
+        InputStream is = new FileInputStream(file);
+
+        long length = file.length();
+        if (length > Integer.MAX_VALUE) {
+            // File is too large
+        }
+        byte[] bytes = new byte[(int)length];
+
+        int offset = 0;
+        int numRead = 0;
+        while (offset < bytes.length
+                && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+            offset += numRead;
+        }
+
+        if (offset < bytes.length) {
+            throw new IOException("Could not completely read file "+file.getName());
+        }
+
+        is.close();
+        return bytes;
+    }
 
     @NonNull
     private MultipartBody.Part prepareFilePart(String partName, String filePath) {
         // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
         // use the FileUtils to get the actual file by uri
+        contentResolver = getContentResolver();
         File file = new File(filePath);
 
         // create RequestBody instance from file
         RequestBody requestFile =
-                RequestBody.create(
-                        MediaType.parse(getContentResolver().getType(Uri.parse(new File(filePath).toString()))),
-                        file
-                );
+                getRequestFile(filePath, file);
 
         // MultipartBody.Part is used to send also the actual file name
         return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+    }
+
+    private RequestBody getRequestFile(String filePath, File file) {
+        return RequestBody.create(
+                getParse(filePath), file
+        );
+    }
+
+    @Nullable
+    private MediaType getParse(String filePath) {
+        File file = new File(filePath);
+        Uri uri = Uri.parse(file.toString());
+        String type = contentResolver.getType(uri);
+        if(uri.getScheme() != null){
+            type = contentResolver.getType(uri);
+        }else{
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                    .toString());
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    fileExtension.toLowerCase());
+        }
+        return MediaType.parse(type);
     }
 
     class RecordButton extends Button {
@@ -202,11 +273,11 @@ public class RegistrationActivity extends AppCompatActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
+        retrofit = new RetrofitImpl();
+
         // Record to the external cache directory for visibility
-        mFileName = getExternalCacheDir().getAbsolutePath();
+        mFileName = getExternalStorageDirectory().getAbsolutePath();
         mFileName += "/audiorecordtest.3gp";
-
-
 
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
 
