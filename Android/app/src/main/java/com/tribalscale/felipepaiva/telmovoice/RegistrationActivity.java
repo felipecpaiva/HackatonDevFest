@@ -115,7 +115,7 @@ public class RegistrationActivity extends BaseActivity {
     private void startRecording() {
         mRecorder = new MediaRecorder();
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mRecorder.setOutputFile(mFileName);
         mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 
@@ -151,7 +151,8 @@ public class RegistrationActivity extends BaseActivity {
             }else{
                 voiceRequest.setText(s);
             }
-            voiceRequest.setId("TaylorDavis10000036152");
+            voiceRequest.setId("Mark1234000123");
+//            voiceRequest.setId("TaylorDavis10000036152");
             voiceRequest.setData(encodeFileToBase64Binary(mFileName));
             responseBodyCall = retrofit.getTelmoService().uploadMultipleFilesDynamic(voiceRequest);
         } catch (IOException e) {
