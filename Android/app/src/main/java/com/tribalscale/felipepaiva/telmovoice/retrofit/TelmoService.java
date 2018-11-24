@@ -14,6 +14,6 @@ public interface TelmoService {
     @POST("")
     Call<Response> pushAudio(@Path("user") String user);
 
-    @POST("http://10.4.92.60:8080/")
+    @POST("http://10.4.93.2:8080/")
     Call<VoiceRequestResponse> uploadMultipleFilesDynamic(@Body VoiceRequest files);
 }

@@ -52,10 +52,9 @@ public class RegistrationActivity extends BaseActivity {
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static String mFileName = null;
 
-    private RecordButton mRecordButton = null;
+    boolean mStartRecording = true;
     private MediaRecorder mRecorder = null;
 
-    private PlayButton   mPlayButton = null;
     private MediaPlayer mPlayer = null;
 
     public VoiceRequest voiceRequest = new VoiceRequest();
@@ -80,11 +79,11 @@ public class RegistrationActivity extends BaseActivity {
 
     private void onRecord(boolean start) {
         if (start) {
-            startListening();
+//            startListening();
             startRecording();
         } else {
             stopRecording();
-            stopListening();
+//            stopListening();
         }
     }
 
@@ -115,7 +114,7 @@ public class RegistrationActivity extends BaseActivity {
     private void startRecording() {
         mRecorder = new MediaRecorder();
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mRecorder.setOutputFile(mFileName);
         mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 
@@ -151,6 +150,7 @@ public class RegistrationActivity extends BaseActivity {
             }else{
                 voiceRequest.setText(s);
             }
+//            voiceRequest.setId("Mark1234000123");
             voiceRequest.setId("TaylorDavis10000036152");
             voiceRequest.setData(encodeFileToBase64Binary(mFileName));
             responseBodyCall = retrofit.getTelmoService().uploadMultipleFilesDynamic(voiceRequest);
@@ -259,49 +259,49 @@ public class RegistrationActivity extends BaseActivity {
         return MediaType.parse(type);
     }
 
-    class RecordButton extends Button {
-        boolean mStartRecording = true;
+//    class RecordButton extends Button {
+//        boolean mStartRecording = true;
+//
+//        OnClickListener clicker = new OnClickListener() {
+//            public void onClick(View v) {
+//                onRecord(mStartRecording);
+//                if (mStartRecording) {
+//                    setText("Stop recording");
+//                } else {
+//                    setText("Start recording");
+//                }
+//                mStartRecording = !mStartRecording;
+//            }
+//        };
+//
+//        public RecordButton(Context ctx) {
+//            super(ctx);
+//            setText("Start recording");
+//            setOnClickListener(clicker);
+//        }
+//    }
 
-        OnClickListener clicker = new OnClickListener() {
-            public void onClick(View v) {
-                onRecord(mStartRecording);
-                if (mStartRecording) {
-                    setText("Stop recording");
-                } else {
-                    setText("Start recording");
-                }
-                mStartRecording = !mStartRecording;
-            }
-        };
-
-        public RecordButton(Context ctx) {
-            super(ctx);
-            setText("Start recording");
-            setOnClickListener(clicker);
-        }
-    }
-
-    class PlayButton extends Button {
-        boolean mStartPlaying = true;
-
-        OnClickListener clicker = new OnClickListener() {
-            public void onClick(View v) {
-                onPlay(mStartPlaying);
-                if (mStartPlaying) {
-                    setText("Stop playing");
-                } else {
-                    setText("Start playing");
-                }
-                mStartPlaying = !mStartPlaying;
-            }
-        };
-
-        public PlayButton(Context ctx) {
-            super(ctx);
-            setText("Start playing");
-            setOnClickListener(clicker);
-        }
-    }
+//    class PlayButton extends Button {
+//        boolean mStartPlaying = true;
+//
+//        OnClickListener clicker = new OnClickListener() {
+//            public void onClick(View v) {
+//                onPlay(mStartPlaying);
+//                if (mStartPlaying) {
+//                    setText("Stop playing");
+//                } else {
+//                    setText("Start playing");
+//                }
+//                mStartPlaying = !mStartPlaying;
+//            }
+//        };
+//
+//        public PlayButton(Context ctx) {
+//            super(ctx);
+//            setText("Start playing");
+//            setOnClickListener(clicker);
+//        }
+//    }
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -314,21 +314,33 @@ public class RegistrationActivity extends BaseActivity {
         mFileName += "/audiorecordtest.3gp";
 
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
-
-        LinearLayout ll = new LinearLayout(this);
-        mRecordButton = new RecordButton(this);
-        ll.addView(mRecordButton,
-                new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        0));
-        mPlayButton = new PlayButton(this);
-        ll.addView(mPlayButton,
-                new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        0));
-        setContentView(ll);
+//
+//        LinearLayout ll = new LinearLayout(this);
+//        mRecordButton = new RecordButton(this);
+//        ll.addView(mRecordButton,
+//                new LinearLayout.LayoutParams(
+//                        ViewGroup.LayoutParams.WRAP_CONTENT,
+//                        ViewGroup.LayoutParams.WRAP_CONTENT,
+//                        0));
+//        mPlayButton = new PlayButton(this);
+//        ll.addView(mPlayButton,
+//                new LinearLayout.LayoutParams(
+//                        ViewGroup.LayoutParams.WRAP_CONTENT,
+//                        ViewGroup.LayoutParams.WRAP_CONTENT,
+//                        0));
+        setContentView(R.layout.registration_main);
+        findViewById(R.id.auth_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onRecord(mStartRecording);
+//                if (mStartRecording) {
+//                    setText("Stop recording");
+//                } else {
+//                    setText("Start recording");
+//                }
+                mStartRecording = !mStartRecording;
+            }
+        });
     }
 
     @Override
