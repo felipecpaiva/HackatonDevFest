@@ -17,8 +17,8 @@ public class RetrofitImpl implements RetrofitInterface {
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         final OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .readTimeout(10, TimeUnit.SECONDS)
-                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(3000, TimeUnit.SECONDS)
+                .connectTimeout(30000, TimeUnit.SECONDS)
                 .addInterceptor(interceptor)
                 .build();
 
