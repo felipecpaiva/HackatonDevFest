@@ -128,7 +128,6 @@ public class BaseActivity extends AppCompatActivity  implements TextToSpeech.OnI
     public void beginListening(){
         stt = SpeechRecognizer.createSpeechRecognizer(this);
         stt.setRecognitionListener(this);
-        startActivityForResult(recognizer_intent, MY_DATA_CHECK_CODE);
     }
 
     public void stopListening(){

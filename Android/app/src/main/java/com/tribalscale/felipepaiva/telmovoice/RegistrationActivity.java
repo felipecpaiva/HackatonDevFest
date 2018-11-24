@@ -128,9 +128,15 @@ public class RegistrationActivity extends BaseActivity {
 
     private void stopRecording() {
         stopListening();
-        mRecorder.stop();
-        mRecorder.release();
-        mRecorder = null;
+        if (mRecorder != null) {
+            mRecorder.release();
+            mRecorder = null;
+        }
+
+        if (mPlayer != null) {
+            mPlayer.release();
+            mPlayer = null;
+        }
         sendFile();
     }
 
