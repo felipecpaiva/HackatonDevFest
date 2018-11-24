@@ -12,7 +12,6 @@ import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +35,6 @@ import javax.inject.Inject;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -78,9 +76,11 @@ public class RegistrationActivity extends BaseActivity {
 
     private void onRecord(boolean start) {
         if (start) {
-            startRecording();
+//            startRecording();
+            startListening();
         } else {
-            stopRecording();
+//            stopRecording();
+            stopListening();
         }
     }
 
@@ -109,7 +109,6 @@ public class RegistrationActivity extends BaseActivity {
     }
 
     private void startRecording() {
-        beginListening();
         mRecorder = new MediaRecorder();
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -123,7 +122,6 @@ public class RegistrationActivity extends BaseActivity {
         }
 
         mRecorder.start();
-
     }
 
     private void stopRecording() {
@@ -137,14 +135,14 @@ public class RegistrationActivity extends BaseActivity {
             mPlayer.release();
             mPlayer = null;
         }
-        sendFile();
+        sendFile(String.valueOf(""));
     }
 
-    private void sendFile() {
+    private void sendFile(String s) {
         Call<VoiceRequestResponse> responseBodyCall = null;
         RequestBody body = null;
         try {
-            voiceRequest.setText("balance");
+            voiceRequest.setText(s);
             voiceRequest.setId("Mark1234000123");
             voiceRequest.setData(encodeFileToBase64Binary(mFileName));
             responseBodyCall = retrofit.getTelmoService().uploadMultipleFilesDynamic(voiceRequest);
@@ -331,12 +329,9 @@ public class RegistrationActivity extends BaseActivity {
             str += data.get(i);
         }
         Log.d(TAG, "results: "+String.valueOf(data.size()));
-    }
 
-    @Override
-    public void onPartialResults(Bundle bundle) {
-        ArrayList data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-        String word = (String) data.get(data.size() - 1);
-        Log.i("TEST", "partial_results: " + word);
+        if(data.size() > 0){
+            sendFile(String.valueOf(data.get(0)));
+        }
     }
 }
