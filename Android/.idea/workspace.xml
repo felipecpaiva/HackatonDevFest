@@ -52,7 +52,7 @@
       <file leaf-file-name="RegistrationActivity.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/tribalscale/felipepaiva/telmovoice/RegistrationActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="84">
+            <state relative-caret-position="355">
               <caret line="314" lean-forward="true" selection-start-line="314" selection-end-line="314" />
             </state>
           </provider>
@@ -2534,7 +2534,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Android Profiler" />
@@ -2546,8 +2545,8 @@
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
       <window_info anchor="right" id="Viewer" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" weight="0.32969698" />
-      <window_info active="true" anchor="bottom" id="Logcat" visible="true" weight="0.32848486" />
+      <window_info active="true" anchor="bottom" id="Terminal" visible="true" weight="0.32969698" />
+      <window_info anchor="bottom" id="Logcat" weight="0.32848486" />
       <window_info id="Captures" order="2" weight="0.25" />
       <window_info id="Capture Tool" />
       <window_info id="Designer" />
@@ -2624,7 +2623,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/tribalscale/felipepaiva/telmovoice/RegistrationActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="84">
+        <state relative-caret-position="355">
           <caret line="314" lean-forward="true" selection-start-line="314" selection-end-line="314" />
         </state>
       </provider>
