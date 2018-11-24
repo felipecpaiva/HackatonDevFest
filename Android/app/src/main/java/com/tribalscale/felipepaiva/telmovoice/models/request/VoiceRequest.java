@@ -4,7 +4,7 @@ public class VoiceRequest {
 
     private String data;
 
-    private String text;
+    private String text = "balance";
 
     private String id;
 

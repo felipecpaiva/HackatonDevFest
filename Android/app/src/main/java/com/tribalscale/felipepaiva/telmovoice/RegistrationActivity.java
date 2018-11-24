@@ -12,6 +12,7 @@ import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,9 @@ import android.widget.LinearLayout;
 import com.tribalscale.felipepaiva.telmovoice.models.response.VoiceRequestResponse;
 import com.tribalscale.felipepaiva.telmovoice.retrofit.RetrofitImpl;
 import com.tribalscale.felipepaiva.telmovoice.models.request.VoiceRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -76,10 +80,10 @@ public class RegistrationActivity extends BaseActivity {
 
     private void onRecord(boolean start) {
         if (start) {
-//            startRecording();
             startListening();
+            startRecording();
         } else {
-//            stopRecording();
+            stopRecording();
             stopListening();
         }
     }
@@ -142,8 +146,12 @@ public class RegistrationActivity extends BaseActivity {
         Call<VoiceRequestResponse> responseBodyCall = null;
         RequestBody body = null;
         try {
-            voiceRequest.setText(s);
-            voiceRequest.setId("Mark1234000123");
+            if(s.isEmpty()){
+                voiceRequest.setText("Hey Eva");
+            }else{
+                voiceRequest.setText(s);
+            }
+            voiceRequest.setId("TaylorDavis10000036152");
             voiceRequest.setData(encodeFileToBase64Binary(mFileName));
             responseBodyCall = retrofit.getTelmoService().uploadMultipleFilesDynamic(voiceRequest);
         } catch (IOException e) {
@@ -153,7 +161,25 @@ public class RegistrationActivity extends BaseActivity {
         responseBodyCall.enqueue(new Callback<VoiceRequestResponse>() {
             @Override
             public void onResponse(Call<VoiceRequestResponse> call, Response<VoiceRequestResponse> response) {
-                speakText(response.body().getMessage());
+                if(response.body() != null){
+                    speakText(response.body().getMessage());
+                }else{
+                    handleError(response);
+                }
+            }
+
+            private void handleError(Response<VoiceRequestResponse> call) {
+                JsonReader jsonReader = new JsonReader(call.errorBody().charStream());
+                JSONObject mainObject = null;
+                try {
+                    mainObject = new JSONObject(call.errorBody().string());
+                    speakText(mainObject.getString("message"));
+                } catch (JSONException e) {
+                    speakText("Something get wrong");
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override

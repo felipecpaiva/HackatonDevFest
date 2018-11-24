@@ -2,7 +2,7 @@ package com.tribalscale.felipepaiva.telmovoice.models.response;
 
 public class VoiceRequestResponse {
     private String status;
-    private String message;
+    private String message = "";
     private String id;
 
     public String getStatus() {
