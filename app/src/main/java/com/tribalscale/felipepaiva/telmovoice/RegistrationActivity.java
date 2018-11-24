@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.speech.SpeechRecognizer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Base64;
 
 import javax.inject.Inject;
@@ -42,6 +44,7 @@ import retrofit2.Response;
 import static android.os.Environment.getExternalStorageDirectory;
 
 public class RegistrationActivity extends BaseActivity {
+    private String TAG = RegistrationActivity.class.getName();
 
     private static final String LOG_TAG = "AudioRecordTest";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
@@ -53,13 +56,14 @@ public class RegistrationActivity extends BaseActivity {
     private PlayButton   mPlayButton = null;
     private MediaPlayer mPlayer = null;
 
+    public VoiceRequest voiceRequest = new VoiceRequest();
+
     @Inject RetrofitImpl retrofit;
 
     // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
     private String [] permissions = {Manifest.permission.RECORD_AUDIO};
     private ContentResolver contentResolver;
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -105,6 +109,7 @@ public class RegistrationActivity extends BaseActivity {
     }
 
     private void startRecording() {
+        beginListening();
         mRecorder = new MediaRecorder();
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -118,9 +123,11 @@ public class RegistrationActivity extends BaseActivity {
         }
 
         mRecorder.start();
+
     }
 
     private void stopRecording() {
+        stopListening();
         mRecorder.stop();
         mRecorder.release();
         mRecorder = null;
@@ -131,7 +138,6 @@ public class RegistrationActivity extends BaseActivity {
         Call<VoiceRequestResponse> responseBodyCall = null;
         RequestBody body = null;
         try {
-            VoiceRequest voiceRequest = new VoiceRequest();
             voiceRequest.setText("balance");
             voiceRequest.setId("Mark1234000123");
             voiceRequest.setData(encodeFileToBase64Binary(mFileName));
@@ -147,9 +153,7 @@ public class RegistrationActivity extends BaseActivity {
             }
 
             @Override
-            public void onFailure(Call<VoiceRequestResponse> call, Throwable t) {
-
-            }
+            public void onFailure(Call<VoiceRequestResponse> call, Throwable t) {}
         });
     }
 
@@ -309,5 +313,24 @@ public class RegistrationActivity extends BaseActivity {
             mPlayer.release();
             mPlayer = null;
         }
+    }
+
+    @Override
+    public void onResults(Bundle results) {
+        String str = new String();
+        Log.d(TAG, "onResults " + results);
+        ArrayList data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        for (int i = 0; i < data.size(); i++) {
+            Log.d(TAG, "result " + data.get(i));
+            str += data.get(i);
+        }
+        Log.d(TAG, "results: "+String.valueOf(data.size()));
+    }
+
+    @Override
+    public void onPartialResults(Bundle bundle) {
+        ArrayList data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        String word = (String) data.get(data.size() - 1);
+        Log.i("TEST", "partial_results: " + word);
     }
 }

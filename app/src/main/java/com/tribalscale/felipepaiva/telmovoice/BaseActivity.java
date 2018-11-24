@@ -25,11 +25,13 @@ public class BaseActivity extends AppCompatActivity  implements TextToSpeech.OnI
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initTextToSpech();
+    }
 
+    private void initTextToSpech() {
         Intent checkIntent = new Intent();
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(checkIntent, MY_DATA_CHECK_CODE);
-//        speakText("Hello World");
     }
 
     protected void onActivityResult(
@@ -39,11 +41,7 @@ public class BaseActivity extends AppCompatActivity  implements TextToSpeech.OnI
                 // success, create the TTS instance
                 mTts = new TextToSpeech(this, this);
                 mTts.setSpeechRate(0.8f);
-
-                stt = SpeechRecognizer.createSpeechRecognizer(this);
-                stt.setRecognitionListener(this);
-
-                recognizer_intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                initSTT();
             } else {
                 // missing data, install it
                 Intent installIntent = new Intent();
@@ -52,6 +50,13 @@ public class BaseActivity extends AppCompatActivity  implements TextToSpeech.OnI
                 startActivity(installIntent);
             }
         }
+    }
+
+    private void initSTT() {
+        stt = SpeechRecognizer.createSpeechRecognizer(this);
+        stt.setRecognitionListener(this);
+
+        recognizer_intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
     }
 
     @Override
@@ -123,5 +128,10 @@ public class BaseActivity extends AppCompatActivity  implements TextToSpeech.OnI
     public void beginListening(){
         stt = SpeechRecognizer.createSpeechRecognizer(this);
         stt.setRecognitionListener(this);
+        startActivityForResult(recognizer_intent, MY_DATA_CHECK_CODE);
+    }
+
+    public void stopListening(){
+        stt.stopListening();
     }
 }
